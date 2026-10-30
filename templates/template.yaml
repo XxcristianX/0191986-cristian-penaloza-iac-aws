@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >
-  Taller Practico Cloud Computing UFPSO - Despliegue de Servidor Web Apache en EC2
-  mediante CloudFormation y GitHub Actions.
+  Taller Practico Cloud Computing UFPSO - Version 2.0 (Actualizada)
+  Servidor Web Apache en EC2 con personalizacion avanzada de diseno y tags.
   Estudiante: Cristian Eduardo Penaloza Granados - Codigo: 0191986.
 
 Parameters:
@@ -9,37 +9,39 @@ Parameters:
     Type: String
     Default: t3.micro
     AllowedValues:
-      - t2.micro
       - t3.micro
-    Description: Tipo de instancia EC2 para capa gratuita de AWS.
+      - t2.micro
+    Description: Tipo de instancia EC2 compatible con Free Tier.
 
   AmiId:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
     Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
-    Description: Resolucion dinamica de la AMI oficial mas reciente de Amazon Linux 2023.
+    Description: Resolucion dinamica de la AMI oficial de Amazon Linux 2023.
 
 Resources:
 
-  # 1. Grupo de Seguridad: Acceso HTTP publico por el puerto 80 (Sin puerto 22 SSH segun el taller)
+  # 1. Grupo de Seguridad Actualizado (Version 2.0)
   ServerSecurityGroupClase:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Acceso HTTP publico en puerto 80 para el Servidor Web
+      GroupDescription: Acceso HTTP publico en puerto 80 - Version 2.0 Actualizada
       Tags:
         - Key: Name
-          Value: SG-HTTP-0191986-CF
+          Value: SG-HTTP-0191986-CF-v2
         - Key: Estudiante
           Value: Cristian-Penaloza
         - Key: Asignatura
           Value: Cloud-Computing
+        - Key: Version
+          Value: 2.0-Actualizada
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
 
-  # 2. Instancia Amazon EC2 con instalacion y arranque de Apache HTTPD
-  MyInstanceClase:
+  # 2. Instancia EC2 Version 2 (Reemplazo controlado para aplicar nuevo User Data)
+  MyInstanceClaseV2:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: !Ref InstanceType
@@ -48,13 +50,13 @@ Resources:
         - !Ref ServerSecurityGroupClase
       Tags:
         - Key: Name
-          Value: EC2-0191986-CristianPenaloza
+          Value: EC2-0191986-CristianPenaloza-v2
         - Key: Proyecto
           Value: Class-CloudFormation
         - Key: Asignatura
           Value: Cloud-Computing-UFPSO
         - Key: Version
-          Value: 1.0-Inicial
+          Value: 2.0-Actualizada
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
@@ -68,88 +70,93 @@ Resources:
           <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Servidor Web EC2 - CloudFormation</title>
+            <title>Servidor Web EC2 - Versión 2.0 Actualizada</title>
             <style>
               body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background-color: #0F172A;
+                font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+                background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
                 color: #F8FAFC;
                 margin: 0;
                 padding: 40px 20px;
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                min-height: 80vh;
+                min-height: 85vh;
               }
               .card {
-                background: #1E293B;
-                border: 2px solid #FF9900;
-                border-radius: 16px;
+                background: rgba(30, 41, 59, 0.95);
+                border: 2px solid #38BDF8;
+                border-radius: 20px;
                 padding: 40px;
-                max-width: 680px;
+                max-width: 720px;
                 width: 100%;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+                box-shadow: 0 20px 35px rgba(0,0,0,0.5);
                 text-align: center;
               }
               h1 {
-                color: #FF9900;
-                font-size: 2rem;
-                margin-bottom: 8px;
-              }
-              h2 {
                 color: #38BDF8;
-                font-size: 1.3rem;
-                margin-top: 0;
-                font-weight: 500;
+                font-size: 2.2rem;
+                margin-bottom: 6px;
               }
-              .divider {
-                height: 1px;
-                background: #334155;
-                margin: 24px 0;
+              .version-badge {
+                background: #FF9900;
+                color: #0F172A;
+                padding: 5px 16px;
+                border-radius: 20px;
+                font-weight: 800;
+                font-size: 0.85rem;
+                display: inline-block;
+                margin-bottom: 16px;
+                letter-spacing: 0.05em;
               }
               .info-grid {
                 text-align: left;
                 background: #0F172A;
-                padding: 20px;
-                border-radius: 10px;
-                margin-bottom: 24px;
+                padding: 24px;
+                border-radius: 12px;
+                margin: 20px 0;
                 border: 1px solid #334155;
               }
               .info-row {
                 display: flex;
                 justify-content: space-between;
-                margin-bottom: 10px;
+                margin-bottom: 12px;
                 font-size: 1.05rem;
               }
-              .info-label {
-                color: #94A3B8;
-                font-weight: 600;
+              .info-label { color: #94A3B8; font-weight: 600; }
+              .info-value { color: #F8FAFC; font-weight: 700; }
+              .hobby-box {
+                background: #1E293B;
+                border-left: 4px solid #10B981;
+                padding: 14px;
+                text-align: left;
+                border-radius: 6px;
+                margin-top: 14px;
+                font-size: 0.95rem;
+                color: #E2E8F0;
               }
-              .info-value {
-                color: #F8FAFC;
-                font-weight: 700;
-              }
-              .badge {
+              .status-pill {
                 display: inline-block;
                 background: #10B981;
                 color: #064E3B;
-                padding: 6px 18px;
+                padding: 8px 22px;
                 border-radius: 9999px;
                 font-weight: bold;
+                margin-top: 20px;
                 font-size: 0.95rem;
               }
-              .footer-text {
+              .footer-note {
                 color: #64748B;
-                font-size: 0.85rem;
+                font-size: 0.82rem;
                 margin-top: 20px;
               }
             </style>
           </head>
           <body>
             <div class="card">
-              <h1>¡Servidor Web en AWS EC2! 🚀</h1>
-              <h2>Despliegue Automatizado con CloudFormation & GitHub Actions</h2>
-              <div class="divider"></div>
+              <span class="version-badge">⚡ ACTUALIZACIÓN V2.0 COMPLETADA</span>
+              <h1>¡Servidor Web AWS EC2 Actualizado! 🚀</h1>
+              <p style="color: #94A3B8;">Infraestructura como Código (IaC) con CloudFormation y GitHub Actions</p>
               
               <div class="info-grid">
                 <div class="info-row">
@@ -161,27 +168,27 @@ Resources:
                   <span class="info-value">0191986</span>
                 </div>
                 <div class="info-row">
-                  <span class="info-label">Programa Académico:</span>
-                  <span class="info-value">Ingeniería de Sistemas</span>
+                  <span class="info-label">Programa:</span>
+                  <span class="info-value">Ingeniería de Sistemas - UFPSO</span>
                 </div>
                 <div class="info-row">
                   <span class="info-label">Asignatura:</span>
-                  <span class="info-value">Cloud Computing</span>
+                  <span class="info-value">Cloud Computing (10mo Semestre)</span>
                 </div>
-                <div class="info-row">
+                <div class="info-row" style="margin-bottom: 0;">
                   <span class="info-label">Docente de Cátedra:</span>
                   <span class="info-value">Wilder Andrés Duarte Neira</span>
                 </div>
-                <div class="info-row" style="margin-bottom: 0;">
-                  <span class="info-label">Institución:</span>
-                  <span class="info-value">UFPSO (Ocaña, Colombia)</span>
+                
+                <div class="hobby-box">
+                  <strong>💡 Enfoque e Interés Profesional:</strong> Arquitecturas en la Nube, Automatización CI/CD, Protocolos Financieros y Sistemas Distribuidos de Alta Disponibilidad.
                 </div>
               </div>
 
               <div>
-                <span class="badge">● Estado: Servidor Web Apache Activo</span>
+                <span class="status-pill">● Estado: Actualización exitosa en CloudFormation (UPDATE_COMPLETE)</span>
               </div>
-              <p class="footer-text">Infraestructura como Código (IaC) - Taller Práctico de Cómputo en la Nube</p>
+              <p class="footer-note">Evidencia de Actualización Continua (Punto 8 del Taller)</p>
             </div>
           </body>
           </html>
@@ -189,13 +196,13 @@ Resources:
 
 Outputs:
   InstanceId:
-    Description: ID unico de la instancia EC2 creada
-    Value: !Ref MyInstanceClase
+    Description: ID unico de la instancia EC2 actualizada
+    Value: !Ref MyInstanceClaseV2
 
   PublicIp:
-    Description: Direccion IP publica asignada a la instancia
-    Value: !GetAtt MyInstanceClase.PublicIp
+    Description: Direccion IP publica de la nueva instancia
+    Value: !GetAtt MyInstanceClaseV2.PublicIp
 
   WebsiteURL:
-    Description: URL publica para acceder al servidor web en el navegador
-    Value: !Sub "http://${MyInstanceClase.PublicIp}"
+    Description: URL publica del servidor web actualizado
+    Value: !Sub "http://${MyInstanceClaseV2.PublicIp}"
