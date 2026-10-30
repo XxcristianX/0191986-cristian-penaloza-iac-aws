@@ -1,0 +1,193 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Taller Practico Cloud Computing UFPSO - Version 2.0 (Actualizada)
+  Servidor Web Apache en EC2 con personalizacion avanzada.
+  Estudiante: Cristian Eduardo Penaloza Granados - Codigo: 0191986.
+
+Parameters:
+  InstanceType:
+    Type: String
+    Default: t2.micro
+    Description: Tipo de instancia EC2.
+
+  AmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
+    Description: AMI oficial de Amazon Linux 2023.
+
+Resources:
+
+  ServerSecurityGroupClase:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Acceso HTTP publico en puerto 80 - Actualizado
+      Tags:
+        - Key: Name
+          Value: SG-HTTP-0191986-CF-v2
+        - Key: Estudiante
+          Value: Cristian-Penaloza
+        - Key: Version
+          Value: 2.0-Actualizada
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  MyInstanceClase:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: !Ref AmiId
+      SecurityGroups:
+        - !Ref ServerSecurityGroupClase
+      Tags:
+        - Key: Name
+          Value: EC2-0191986-CristianPenaloza-v2
+        - Key: Proyecto
+          Value: Class-CloudFormation
+        - Key: Asignatura
+          Value: Cloud-Computing-UFPSO
+        - Key: Version
+          Value: 2.0-Actualizada
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install -y httpd
+          systemctl start httpd
+          systemctl enable httpd
+          cat << 'EOF' > /var/www/html/index.html
+          <!DOCTYPE html>
+          <html lang="es">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Servidor Web EC2 - Versión 2.0</title>
+            <style>
+              body {
+                font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+                background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+                color: #F8FAFC;
+                margin: 0;
+                padding: 40px 20px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 85vh;
+              }
+              .card {
+                background: rgba(30, 41, 59, 0.95);
+                border: 2px solid #38BDF8;
+                border-radius: 20px;
+                padding: 40px;
+                max-width: 720px;
+                width: 100%;
+                box-shadow: 0 20px 35px rgba(0,0,0,0.5);
+                text-align: center;
+              }
+              h1 {
+                color: #38BDF8;
+                font-size: 2.2rem;
+                margin-bottom: 6px;
+              }
+              .version-badge {
+                background: #FF9900;
+                color: #0F172A;
+                padding: 4px 14px;
+                border-radius: 20px;
+                font-weight: 800;
+                font-size: 0.85rem;
+                display: inline-block;
+                margin-bottom: 16px;
+              }
+              .info-grid {
+                text-align: left;
+                background: #0F172A;
+                padding: 24px;
+                border-radius: 12px;
+                margin: 20px 0;
+                border: 1px solid #334155;
+              }
+              .info-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 12px;
+                font-size: 1.05rem;
+              }
+              .info-label { color: #94A3B8; font-weight: 600; }
+              .info-value { color: #F8FAFC; font-weight: 700; }
+              .hobby-box {
+                background: #1E293B;
+                border-left: 4px solid #10B981;
+                padding: 14px;
+                text-align: left;
+                border-radius: 6px;
+                margin-top: 14px;
+                font-size: 0.95rem;
+                color: #E2E8F0;
+              }
+              .status-pill {
+                display: inline-block;
+                background: #10B981;
+                color: #064E3B;
+                padding: 8px 20px;
+                border-radius: 9999px;
+                font-weight: bold;
+                margin-top: 20px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="card">
+              <span class="version-badge">ACTUALIZACIÓN V2.0 COMPLETADA</span>
+              <h1>¡Servidor Web AWS EC2 Actualizado! 🚀</h1>
+              <p style="color: #94A3B8;">Infraestructura como Código (IaC) con CloudFormation y GitHub Actions</p>
+              
+              <div class="info-grid">
+                <div class="info-row">
+                  <span class="info-label">Estudiante:</span>
+                  <span class="info-value">Cristian Eduardo Peñaloza Granados</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Código Estudiantil:</span>
+                  <span class="info-value">0191986</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Programa:</span>
+                  <span class="info-value">Ingeniería de Sistemas - UFPSO</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Asignatura:</span>
+                  <span class="info-value">Cloud Computing (10mo Semestre)</span>
+                </div>
+                <div class="info-row" style="margin-bottom: 0;">
+                  <span class="info-label">Docente:</span>
+                  <span class="info-value">Wilder Andrés Duarte Neira</span>
+                </div>
+                
+                <div class="hobby-box">
+                  <strong>💡 Interés y Enfoque Profesional:</strong> Arquitecturas en la Nube, Automatización CI/CD, Protocolos Financieros y Sistemas Distribuidos.
+                </div>
+              </div>
+
+              <div>
+                <span class="status-pill">● Estado: Actualización exitosa en CloudFormation (UPDATE_COMPLETE)</span>
+              </div>
+            </div>
+          </body>
+          </html>
+          EOF
+
+Outputs:
+  InstanceId:
+    Description: ID unico de la instancia EC2
+    Value: !Ref MyInstanceClase
+
+  PublicIp:
+    Description: Direccion IP publica
+    Value: !GetAtt MyInstanceClase.PublicIp
+
+  WebsiteURL:
+    Description: URL publica del servidor web
+    Value: !Sub "http://${MyInstanceClase.PublicIp}"

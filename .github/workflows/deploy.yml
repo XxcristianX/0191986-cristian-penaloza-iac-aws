@@ -1,0 +1,41 @@
+name: Despliegue de infraestructura AWS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Desplegar Stack CloudFormation en AWS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar codigo del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar credenciales de AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
+
+      - name: Desplegar Stack en CloudFormation
+        run: |
+          echo "Iniciando despliegue de Infraestructura como Codigo (IaC)..."
+          aws cloudformation deploy \
+            --template-file templates/template.yaml \
+            --stack-name proyecto-web-iac \
+            --capabilities CAPABILITY_IAM \
+            --no-fail-on-empty-changeset
+
+      - name: Obtener IP publica y salidas del Stack
+        run: |
+          echo "Consultando salidas generadas por CloudFormation..."
+          aws cloudformation describe-stacks \
+            --stack-name proyecto-web-iac \
+            --query "Stacks[0].Outputs" \
+            --output table

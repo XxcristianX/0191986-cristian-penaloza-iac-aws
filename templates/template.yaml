@@ -1,0 +1,201 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Taller Practico Cloud Computing UFPSO - Despliegue de Servidor Web Apache en EC2
+  mediante CloudFormation y GitHub Actions.
+  Estudiante: Cristian Eduardo Penaloza Granados - Codigo: 0191986.
+
+Parameters:
+  InstanceType:
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.micro
+      - t3.micro
+    Description: Tipo de instancia EC2 para capa gratuita de AWS.
+
+  AmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
+    Description: Resolucion dinamica de la AMI oficial mas reciente de Amazon Linux 2023.
+
+Resources:
+
+  # 1. Grupo de Seguridad: Acceso HTTP publico por el puerto 80 (Sin puerto 22 SSH segun el taller)
+  ServerSecurityGroupClase:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Acceso HTTP publico en puerto 80 para el Servidor Web
+      Tags:
+        - Key: Name
+          Value: SG-HTTP-0191986-CF
+        - Key: Estudiante
+          Value: Cristian-Penaloza
+        - Key: Asignatura
+          Value: Cloud-Computing
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  # 2. Instancia Amazon EC2 con instalacion y arranque de Apache HTTPD
+  MyInstanceClase:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: !Ref AmiId
+      SecurityGroups:
+        - !Ref ServerSecurityGroupClase
+      Tags:
+        - Key: Name
+          Value: EC2-0191986-CristianPenaloza
+        - Key: Proyecto
+          Value: Class-CloudFormation
+        - Key: Asignatura
+          Value: Cloud-Computing-UFPSO
+        - Key: Version
+          Value: 1.0-Inicial
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install -y httpd
+          systemctl start httpd
+          systemctl enable httpd
+          cat << 'EOF' > /var/www/html/index.html
+          <!DOCTYPE html>
+          <html lang="es">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Servidor Web EC2 - CloudFormation</title>
+            <style>
+              body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background-color: #0F172A;
+                color: #F8FAFC;
+                margin: 0;
+                padding: 40px 20px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 80vh;
+              }
+              .card {
+                background: #1E293B;
+                border: 2px solid #FF9900;
+                border-radius: 16px;
+                padding: 40px;
+                max-width: 680px;
+                width: 100%;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+                text-align: center;
+              }
+              h1 {
+                color: #FF9900;
+                font-size: 2rem;
+                margin-bottom: 8px;
+              }
+              h2 {
+                color: #38BDF8;
+                font-size: 1.3rem;
+                margin-top: 0;
+                font-weight: 500;
+              }
+              .divider {
+                height: 1px;
+                background: #334155;
+                margin: 24px 0;
+              }
+              .info-grid {
+                text-align: left;
+                background: #0F172A;
+                padding: 20px;
+                border-radius: 10px;
+                margin-bottom: 24px;
+                border: 1px solid #334155;
+              }
+              .info-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 10px;
+                font-size: 1.05rem;
+              }
+              .info-label {
+                color: #94A3B8;
+                font-weight: 600;
+              }
+              .info-value {
+                color: #F8FAFC;
+                font-weight: 700;
+              }
+              .badge {
+                display: inline-block;
+                background: #10B981;
+                color: #064E3B;
+                padding: 6px 18px;
+                border-radius: 9999px;
+                font-weight: bold;
+                font-size: 0.95rem;
+              }
+              .footer-text {
+                color: #64748B;
+                font-size: 0.85rem;
+                margin-top: 20px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="card">
+              <h1>¡Servidor Web en AWS EC2! 🚀</h1>
+              <h2>Despliegue Automatizado con CloudFormation & GitHub Actions</h2>
+              <div class="divider"></div>
+              
+              <div class="info-grid">
+                <div class="info-row">
+                  <span class="info-label">Estudiante:</span>
+                  <span class="info-value">Cristian Eduardo Peñaloza Granados</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Código Estudiantil:</span>
+                  <span class="info-value">0191986</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Programa Académico:</span>
+                  <span class="info-value">Ingeniería de Sistemas</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Asignatura:</span>
+                  <span class="info-value">Cloud Computing</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Docente de Cátedra:</span>
+                  <span class="info-value">Wilder Andrés Duarte Neira</span>
+                </div>
+                <div class="info-row" style="margin-bottom: 0;">
+                  <span class="info-label">Institución:</span>
+                  <span class="info-value">UFPSO (Ocaña, Colombia)</span>
+                </div>
+              </div>
+
+              <div>
+                <span class="badge">● Estado: Servidor Web Apache Activo</span>
+              </div>
+              <p class="footer-text">Infraestructura como Código (IaC) - Taller Práctico de Cómputo en la Nube</p>
+            </div>
+          </body>
+          </html>
+          EOF
+
+Outputs:
+  InstanceId:
+    Description: ID unico de la instancia EC2 creada
+    Value: !Ref MyInstanceClase
+
+  PublicIp:
+    Description: Direccion IP publica asignada a la instancia
+    Value: !GetAtt MyInstanceClase.PublicIp
+
+  WebsiteURL:
+    Description: URL publica para acceder al servidor web en el navegador
+    Value: !Sub "http://${MyInstanceClase.PublicIp}"
