@@ -7,7 +7,7 @@ Description: >
 Parameters:
   InstanceType:
     Type: String
-    Default: t2.micro
+    Default: t3.micro
     AllowedValues:
       - t2.micro
       - t3.micro
@@ -44,7 +44,7 @@ Resources:
     Properties:
       InstanceType: !Ref InstanceType
       ImageId: !Ref AmiId
-      SecurityGroups:
+      SecurityGroupIds:
         - !Ref ServerSecurityGroupClase
       Tags:
         - Key: Name
